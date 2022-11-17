@@ -1,0 +1,9 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+${helper_dir}/stop
+sleep 3
+${helper_dir}/start

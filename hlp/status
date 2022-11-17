@@ -1,0 +1,30 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+services_by_status() {
+  local status=$1
+  local filter="status=${status}"
+  services="$(${helper_dir}/dc ps --service --filter "${filter}")"
+
+  if [ -n "${services}" ]; then
+    echo
+    echo "${status} services:"
+    echo
+    ${helper_dir}/dc ps --service --filter "${filter}"
+    echo
+    echo "---------------------"
+  fi
+}
+
+services_by_status running
+services_by_status stopped
+services_by_status restarting
+services_by_status paused
+
+echo
+echo "To view logs run: "
+echo "hlp/logs {service-name}"
+echo

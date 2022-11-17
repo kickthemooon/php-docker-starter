@@ -1,0 +1,187 @@
+#!/bin/bash
+cd "${0%/*}"
+err() { echo "[ERROR]: $*" >&2 ; }
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+dir_name="$(basename "$(pwd)")"
+
+composer_version="${COMPOSER_VERSION:-"2.2.6"}"
+
+composer() {
+  docker run -it --rm \
+    -u $(id -u ${USER}):$(id -g ${USER}) \
+    -v $(pwd):/workspace \
+    -w "/workspace" \
+    "composer:${composer_version}" \
+    $@
+}
+
+###################
+# Framework Reset #
+###################
+
+if [ -d "app" ]; then
+  echo
+  echo "[WARN] app directory already exists."
+  while true; do
+    echo
+    echo "Do you want to remove it and continue with initialization: (y/n)"
+    read reset_answer
+
+    if [ "${reset_answer}" != "y" ] &&
+      [ "${reset_answer}" != "yes" ] &&
+      [ "${reset_answer}" != "n" ] &&
+      [ "${reset_answer}" != "no" ]; then
+        echo
+        echo "Please answer with y (yes) or n (no)"
+        continue
+    fi
+    break
+  done
+
+  if [ "${reset_answer}" != "y" ] && [ "${reset_answer}" != "yes" ]; then
+    echo
+    echo "Answer was no. Exiting ..."
+    exit 0
+  fi
+
+  rm -rf app
+fi
+
+####################
+# Framework Choice #
+####################
+
+while true; do
+  echo
+  echo "    1 - Laravel"
+  echo "    2 - Symfony"
+  echo
+  echo "Choose a framework by number (1 or 2): "
+  read framework_choice
+  if [ "${framework_choice}" != "1" ] && [ "${framework_choice}" != "2" ]; then
+    echo "Please choose a number, 1 (Laravel) or 2 (Symfony)"
+    continue
+  fi
+  break
+done
+
+if [ "${framework_choice}" = "1" ]; then
+  framework="laravel"
+  lite="lumen"
+  full="laravel"
+fi
+
+if [ "${framework_choice}" = "2" ]; then
+  framework="symfony"
+  lite="skeleton"
+  full="webapp"
+fi
+
+###############
+# Size Choice #
+###############
+echo
+while true; do
+  echo
+  echo "    1 - Lite (${lite})"
+  echo "    2 - Full (${full})"
+  echo
+  echo "Choose a framework size by number (1 or 2): "
+  read size_choice
+  if [ "${size_choice}" != "1" ] && [ "${size_choice}" != "2" ]; then
+    echo "Please choose a number, 1 (lite) or 2 (full)"
+    continue
+  fi
+  break
+done
+
+if [ "${size_choice}" = "1" ]; then
+  size="lite"
+else
+  size="full"
+fi
+
+echo
+echo "Installing the ${framework} framework in ${size} version ..."
+echo
+
+###################
+# Install Symfony #
+###################
+
+if [ "${framework}" = "symfony" ]; then
+  composer create-project --no-interaction --prefer-dist symfony/skeleton "app"
+  exit_code="${?}"
+
+  if [ "${exit_code}" != "0" ]; then
+    err "Some error occurred during composer create-project. Please review the output. Exiting ..."
+    exit 1
+  fi
+
+  cd app
+  composer require --dev symfony/test-pack
+  exit_code="${?}"
+  cd "${root_dir}"
+
+  if [ "${exit_code}" != "0" ]; then
+    err "Some error occurred during composer create-project. Please review the output. Exiting ..."
+    exit 1
+  fi
+
+  if [ "${size}" = "full" ]; then
+    cd app
+    composer --no-interaction require webapp
+    exit_code="${?}"
+    cd "${root_dir}"
+  fi
+fi
+
+###################
+# Install Laravel #
+###################
+
+if [ "${framework}" = "laravel" ] && [ "${size}" = "full" ]; then
+  composer create-project --no-interaction --prefer-dist laravel/laravel "app"
+  exit_code="${?}"
+  if [ "${exit_code}" != "0" ]; then
+    err "Some error occurred during composer create-project. Please review the output. Exiting ..."
+    exit 1
+  fi
+fi
+
+if [ "${framework}" = "laravel" ] && [ "${size}" = "lite" ]; then
+  composer create-project --no-interaction --prefer-dist laravel/lumen "app"
+  exit_code="${?}"
+  if [ "${exit_code}" != "0" ]; then
+    err "Some error occurred during composer create-project. Please review the output. Exiting ..."
+    exit 1
+  fi
+fi
+
+echo
+echo "Successfully installed ${framework} in the app directory"
+
+echo
+echo "Do you want to build the docker image and start the project with docker-compose? (y/n)"
+read start_answer
+
+if [ "${start_answer}" != "y" ] && [ "${start_answer}" != "yes" ]; then
+  echo
+  echo "Answer was not y or yes."
+  echo
+  echo "You can start the project by running hlp/start"
+  echo
+  exit 0
+fi
+
+echo
+echo "Building image ..."
+echo
+hlp/build
+
+echo
+echo "Starting docker-compose ..."
+echo
+hlp/restart

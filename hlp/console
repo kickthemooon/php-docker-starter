@@ -1,0 +1,13 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+if [ -f "app/artisan" ]; then
+  ${helper_dir}/exec fpm /app/artisan $@
+fi
+
+if [ -f "app/bin/console" ]; then
+  ${helper_dir}/exec fpm /app/bin/console $@
+fi

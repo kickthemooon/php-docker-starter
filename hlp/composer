@@ -1,0 +1,15 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+app_dir="${root_dir}/app"
+cd "${app_dir}"
+
+composer_version="${VERSION:-"2.2.6"}"
+
+docker run -it --rm \
+  -u $(id -u ${USER}):$(id -g ${USER}) \
+  -v $(pwd):/app \
+  -w "/app" \
+  "composer:${composer_version}" \
+  $@

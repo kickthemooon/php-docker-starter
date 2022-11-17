@@ -1,0 +1,48 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+err() {
+ echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
+}
+
+# timout for services start
+timeout_seconds=30
+
+echo
+echo "Running docker-compose up ..."
+echo
+${helper_dir}/dc up -d
+
+echo
+echo "Waiting for services to be running ..."
+start_seconds="${SECONDS}"
+while true; do
+  all_services="$(${helper_dir}/dc ps --services | wc -l | xargs)"
+  running_services="$(${helper_dir}/dc ps --services --filter "status=running" | wc -l | xargs)"
+
+  if [ "${running_services}" -lt "${all_services}" ]; then
+    echo "${running_services} out of ${all_services} are running"
+  fi
+
+  if [ "${running_services}" = "${all_services}" ]; then
+    echo "All services running"
+    echo
+    echo "Happy development 🚀 (http://localhost)"
+    echo
+    break
+  fi
+
+  passed_seconds=$(($SECONDS - $start_seconds))
+  if [ "${passed_seconds}" -gt "${timeout_seconds}" ]; then
+    err "timed out waiting for services to be running"
+    echo
+    ${helper_dir}/dc ps --services
+    echo
+    exit 1
+  fi
+
+  sleep 2
+done

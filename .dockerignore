@@ -1,0 +1,4 @@
+vendor/
+var/
+temp/
+node_modules

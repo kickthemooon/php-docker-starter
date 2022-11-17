@@ -1,0 +1,24 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+inputs="$@"
+
+inputs="${inputs//"\\"/"\\\\"}"
+inputs="${inputs////"\\\\"}"
+
+phpunit_xml_path="app/phpunit.xml"
+phpunit_xml_dist_path="app/phpunit.xml.dist"
+
+if [ -f "${phpunit_xml_path}" ]; then
+  configuration_path="/${phpunit_xml_path}"
+fi
+
+if [ -f "${phpunit_xml_dist_path}" ]; then
+  configuration_path="/${phpunit_xml_dist_path}"
+fi
+
+${helper_dir}/exec test /app/vendor/bin/phpunit --configuration "${configuration_path}" --testdox --filter "${inputs}"
+

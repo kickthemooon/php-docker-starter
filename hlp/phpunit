@@ -1,0 +1,8 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+${helper_dir}/exec test /app/vendor/bin/phpunit $@
+

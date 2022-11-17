@@ -1,0 +1,11 @@
+#!/bin/bash
+cd "${0%/*}"
+helper_dir="$(pwd)"
+root_dir="${helper_dir}/.."
+cd "${root_dir}"
+
+# docker-compose project
+docker_compose_file="docker-compose.yaml"
+docker_compose_project="sb"
+docker_compose_command="docker-compose -f ${docker_compose_file} -p ${docker_compose_project}"
+${docker_compose_command} $@

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+cd "${0%/*}"
+
+# Use this script to wait for external services
+# by setting env variables starting with
+# "SVC_WAIT_" separate host and port
+# and optional timeout by colon
+
+# Example: host:port:timeout
+
+default_timeout="20"
+
+for service_env in $(env | grep SVC_WAIT_); do
+  value="$(echo "${service_env}" | awk -F "=" '{print $2}')"
+
+  host="$(echo "${value}" | awk -F ":" '{print $1}')"
+  port="$(echo "${value}" | awk -F ":" '{print $2}')"
+  timeout="$(echo "${value}" | awk -F ":" '{print $3}')"
+
+  if [ -z "${timeout}" ]; then
+    timeout="${default_timeout}"
+  fi
+
+  ./wait-for-it -h "${host}" -p "${port}" -t "${timeout}"
+done

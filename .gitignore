@@ -1,0 +1,30 @@
+/vendor/
+/temp/
+/.idea/
+/node_modules/
+.phpunit.result.cache
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+###< symfony/framework-bundle ###
+
+###> laravel ###
+npm-debug.log
+yarn-error.log
+bootstrap/compiled.php
+app/storage/
+public/storage
+public/hot
+public_html/storage
+public_html/hot
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+###< laravel ###
