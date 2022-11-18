@@ -4,9 +4,9 @@ This repository serves as php (laravel or symfony) quick-start using docker.
 
 ## Requirements
 
-- docker
-- docker-compose
-- shell (Linux, MacOS, MS WSL2, VM)
+- Shell (Linux, MacOS, MS WSL2, VM)
+- Docker
+
 
 ## Quick-Start
 
