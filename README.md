@@ -88,7 +88,7 @@ The server name comes from the `./nginx/default.conf` `server_name`
 
 ![xdebug-helper](https://i.imgur.com/6t2yfZ7.png "xdebug helper")
 
-3. Check debugging settings in phpstorm and start listening for 
+3. Check debugging settings in phpstorm and start listening for connections
 
 ![xdebug-settings](https://i.imgur.com/BgtGGKd.png "xdebug settings")
 
@@ -101,12 +101,13 @@ The Dockerfile used for running php-fpm comes with a few preinstalled utilities 
 - XDebug
 - Imagick
 - GD
-- and many other ...
+- and many other ...  
+
 You are welcome to review the Dockerfile and adjust it to your needs
 
 ## Other Documentation
 
-Laravel - For more about Laravel please refer to [its documentation](https://laravel.com/docs/9.x)  
+Laravel - For more about laravel please refer to [its documentation](https://laravel.com/docs/9.x)  
 Symfony - For more about symfony please refer to [its documentation](https://symfony.com/doc/current/index.html)  
 Composer - For more about composer please refer to [its documentation](https://getcomposer.org/doc/)  
 PHPUnit - For more about phpunit please refer to [its documentation](https://phpunit.readthedocs.io/en/9.5/)  
